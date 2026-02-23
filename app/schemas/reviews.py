@@ -1,24 +1,28 @@
 from pydantic import BaseModel, Field
+from typing import Optional, Literal
 from datetime import datetime
-from typing import Literal
 
-
-ReviewStatus = Literal["pending", "published", "hidden"]
-
+Sentiment = Literal["positive", "neutral", "negative", "other"]
+Status = Literal["pending", "published", "hidden"]
 
 class ReviewCreate(BaseModel):
-    author_name: str = Field(min_length=2, max_length=80)
-    text: str = Field(min_length=10, max_length=3000)
-    rating: int | None = Field(default=None, ge=1, le=5)
+    author_name: str = Field(..., max_length=80)
+    text: str = Field(..., min_length=3)
+    rating: int = Field(..., ge=1, le=5)
 
+class ReviewCreateFull(ReviewCreate):
+    sentiment: Optional[Sentiment] = None
+    status: Status = "published"
+    is_featured: bool = False
+    created_at: Optional[datetime] = None
 
 class ReviewOut(BaseModel):
     id: int
     author_name: str
     text: str
-    rating: int | None
-    sentiment: str | None
-    status: ReviewStatus
+    rating: int
+    sentiment: Optional[Sentiment] = None
+    status: Status
     is_featured: bool
     created_at: datetime
 
@@ -26,5 +30,8 @@ class ReviewOut(BaseModel):
 
 
 class ReviewPatch(BaseModel):
-    status: ReviewStatus | None = None
-    is_featured: bool | None = None
+    status: Optional[str] = None
+    is_featured: Optional[bool] = None
+    sentiment: Optional[Sentiment] = None
+
+    model_config = {"from_attributes": True}

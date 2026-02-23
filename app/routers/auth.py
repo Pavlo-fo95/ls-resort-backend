@@ -78,7 +78,7 @@ async def google_verify(payload: GoogleVerifyIn, db: AsyncSession = Depends(get_
 
     data = resp.json()
 
-    # ✅ защита: токен должен быть выдан твоему приложению
+    # защита: токен должен быть выдан твоему приложению
     GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "").strip()
     aud = data.get("aud")
     if GOOGLE_CLIENT_ID and aud != GOOGLE_CLIENT_ID:
@@ -86,12 +86,12 @@ async def google_verify(payload: GoogleVerifyIn, db: AsyncSession = Depends(get_
 
     email = data.get("email")
     sub = data.get("sub")
-    aud = data.get("aud")  # 👈 ВАЖНО
+    aud = data.get("aud")
 
     if not email or not sub:
         raise HTTPException(401, "Google token invalid (no email/sub)")
 
-    # 🔐 Проверяем, что токен выдан именно нашему приложению
+    # Проверяем, что токен выдан именно нашему приложению
     if GOOGLE_CLIENT_ID and aud != GOOGLE_CLIENT_ID:
         raise HTTPException(401, "Google token has wrong audience")
 
@@ -99,7 +99,7 @@ async def google_verify(payload: GoogleVerifyIn, db: AsyncSession = Depends(get_
     u = await db.scalar(select(User).where(User.email == email))
 
     if not u:
-        # 🎯 создаем нового пользователя с безопасным случайным паролем
+        # создаем нового пользователя с безопасным случайным паролем
         random_pass = secrets.token_urlsafe(16)
 
         u = User(

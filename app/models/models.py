@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 
 from sqlalchemy import String, Text, DateTime, Boolean, Integer, text
-from sqlalchemy import text as sa_text   # ← ВОТ ЭТО
+from sqlalchemy import text as sa_text
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
@@ -100,4 +100,23 @@ class Review(Base):
         DateTime,
         nullable=False,
         server_default=func.now(),
+    )
+
+
+class SearchEvent(Base):
+    __tablename__ = "search_events"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+
+    query: Mapped[str] = mapped_column(String(200), nullable=False)
+    query_norm: Mapped[str] = mapped_column(String(200), nullable=False, index=True)
+
+    lang: Mapped[str] = mapped_column(String(5), nullable=False, server_default="ua")
+    session_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+
+    chosen_route: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    chosen_item_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, server_default=func.now()
     )
