@@ -25,6 +25,7 @@ def cors_origins() -> list[str]:
     if raw.strip():
         return [x.strip() for x in raw.split(",") if x.strip()]
     return [
+        "https://lebedi.pages.dev",
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost:3000",
